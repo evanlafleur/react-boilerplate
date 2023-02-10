@@ -1,0 +1,47 @@
+version: "2"
+
+services:
+  client:
+    image: boilerplate-client
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+    entrypoint: ["npm", "start"]
+    links:
+      - api
+    build: ./client
+    networks:
+      - boilerplatenetwork
+  
+  api:
+    image: boilerplate-api
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./api:/api
+      - /api/node_modules
+    depends_on:
+      - mongodb
+    build: ./api
+    networks:
+      - boilerplatenetwork
+  
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: mongodb
+    volumes:
+      - ./data-node:/data/db
+    ports:
+      - 27017:27017
+    command: mongodb --noauth --smallfiles
+    networks:
+      - boilerplatenetwork
+
+networks:
+  boilerplatenetwork:
+    driver: bridge
